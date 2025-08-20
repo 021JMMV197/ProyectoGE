@@ -159,6 +159,7 @@
     <Content Include="Global.asax" />
     <Content Include="Pages\frmDepartamentos.aspx" />
     <Content Include="Pages\frmEmpleados.aspx" />
+    <Content Include="Pages\frmPuestos.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -251,6 +252,7 @@
     <Compile Include="Models\DepartamentoApiClient.cs" />
     <Compile Include="Models\EmpleadoApiClient.cs" />
     <Compile Include="Models\EmpleadosDAL.cs" />
+    <Compile Include="Models\PuestoApiClient.cs" />
     <Compile Include="Pages\frmDepartamentos.aspx.cs">
       <DependentUpon>frmDepartamentos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -264,6 +266,13 @@
     </Compile>
     <Compile Include="Pages\frmEmpleados.aspx.designer.cs">
       <DependentUpon>frmEmpleados.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\frmPuestos.aspx.cs">
+      <DependentUpon>frmPuestos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmPuestos.aspx.designer.cs">
+      <DependentUpon>frmPuestos.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
