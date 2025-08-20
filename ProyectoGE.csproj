@@ -157,9 +157,13 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Pages\frmAsistencia.aspx" />
+    <Content Include="Pages\frmBeneficios.aspx" />
     <Content Include="Pages\frmDepartamentos.aspx" />
+    <Content Include="Pages\frmEmpleadoBeneficio.aspx" />
     <Content Include="Pages\frmEmpleados.aspx" />
     <Content Include="Pages\frmPuestos.aspx" />
+    <Content Include="Pages\frmVacaciones.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -248,17 +252,42 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\AsistenciaApiClient.cs" />
+    <Compile Include="Models\BeneficioApiClient.cs" />
     <Compile Include="Models\ConexionDB.cs" />
     <Compile Include="Models\DepartamentoApiClient.cs" />
     <Compile Include="Models\EmpleadoApiClient.cs" />
+    <Compile Include="Models\EmpleadoBeneficioApiClient.cs" />
     <Compile Include="Models\EmpleadosDAL.cs" />
     <Compile Include="Models\PuestoApiClient.cs" />
+    <Compile Include="Models\VacacionesApiClient.cs" />
+    <Compile Include="Pages\frmAsistencia.aspx.cs">
+      <DependentUpon>frmAsistencia.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmAsistencia.aspx.designer.cs">
+      <DependentUpon>frmAsistencia.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\frmBeneficios.aspx.cs">
+      <DependentUpon>frmBeneficios.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmBeneficios.aspx.designer.cs">
+      <DependentUpon>frmBeneficios.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\frmDepartamentos.aspx.cs">
       <DependentUpon>frmDepartamentos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Pages\frmDepartamentos.aspx.designer.cs">
       <DependentUpon>frmDepartamentos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\frmEmpleadoBeneficio.aspx.cs">
+      <DependentUpon>frmEmpleadoBeneficio.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmEmpleadoBeneficio.aspx.designer.cs">
+      <DependentUpon>frmEmpleadoBeneficio.aspx</DependentUpon>
     </Compile>
     <Compile Include="Pages\frmEmpleados.aspx.cs">
       <DependentUpon>frmEmpleados.aspx</DependentUpon>
@@ -273,6 +302,13 @@
     </Compile>
     <Compile Include="Pages\frmPuestos.aspx.designer.cs">
       <DependentUpon>frmPuestos.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\frmVacaciones.aspx.cs">
+      <DependentUpon>frmVacaciones.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmVacaciones.aspx.designer.cs">
+      <DependentUpon>frmVacaciones.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
