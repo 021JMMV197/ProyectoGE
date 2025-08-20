@@ -157,6 +157,7 @@
     <Content Include="Default.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Pages\frmDepartamentos.aspx" />
     <Content Include="Pages\frmEmpleados.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
@@ -247,8 +248,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ConexionDB.cs" />
+    <Compile Include="Models\DepartamentoApiClient.cs" />
     <Compile Include="Models\EmpleadoApiClient.cs" />
     <Compile Include="Models\EmpleadosDAL.cs" />
+    <Compile Include="Pages\frmDepartamentos.aspx.cs">
+      <DependentUpon>frmDepartamentos.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmDepartamentos.aspx.designer.cs">
+      <DependentUpon>frmDepartamentos.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\frmEmpleados.aspx.cs">
       <DependentUpon>frmEmpleados.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

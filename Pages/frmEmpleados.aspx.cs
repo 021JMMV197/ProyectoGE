@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json; // por si lo usas en otras partes
+﻿using Newtonsoft.Json; 
 using ProyectoGE.Models;
 using System;
 using System.Globalization;
