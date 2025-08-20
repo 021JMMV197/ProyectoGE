@@ -3,6 +3,7 @@ using ProyectoGE.Models;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using ProyectoGE.Infrastructure;
 
 namespace ProyectoGE.Pages
 {
@@ -10,8 +11,13 @@ namespace ProyectoGE.Pages
     {
         private readonly EmpleadoApiClient _api = new EmpleadoApiClient();
 
-        protected async void Page_Load(object sender, EventArgs e)
+        protected void Page_Init(object sender, EventArgs e)
         {
+            if (AuthGuard.Require(this)) return; // si redirige, salir
+        }
+
+        protected async void Page_Load(object sender, EventArgs e)
+        { 
             if (!IsPostBack)
                 await CargarAsync();
         }

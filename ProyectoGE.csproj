@@ -162,8 +162,12 @@
     <Content Include="Pages\frmDepartamentos.aspx" />
     <Content Include="Pages\frmEmpleadoBeneficio.aspx" />
     <Content Include="Pages\frmEmpleados.aspx" />
+    <Content Include="Pages\frmEvaluaciones.aspx" />
     <Content Include="Pages\frmPuestos.aspx" />
+    <Content Include="Pages\frmUsuarios.aspx" />
     <Content Include="Pages\frmVacaciones.aspx" />
+    <Content Include="Pages\Login.aspx" />
+    <Content Include="Pages\Logout.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -252,6 +256,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Infrastructure\AuthGuard.cs" />
     <Compile Include="Models\AsistenciaApiClient.cs" />
     <Compile Include="Models\BeneficioApiClient.cs" />
     <Compile Include="Models\ConexionDB.cs" />
@@ -259,7 +264,9 @@
     <Compile Include="Models\EmpleadoApiClient.cs" />
     <Compile Include="Models\EmpleadoBeneficioApiClient.cs" />
     <Compile Include="Models\EmpleadosDAL.cs" />
+    <Compile Include="Models\EvaluacionApiClient.cs" />
     <Compile Include="Models\PuestoApiClient.cs" />
+    <Compile Include="Models\UsuarioApiClient.cs" />
     <Compile Include="Models\VacacionesApiClient.cs" />
     <Compile Include="Pages\frmAsistencia.aspx.cs">
       <DependentUpon>frmAsistencia.aspx</DependentUpon>
@@ -296,6 +303,13 @@
     <Compile Include="Pages\frmEmpleados.aspx.designer.cs">
       <DependentUpon>frmEmpleados.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Pages\frmEvaluaciones.aspx.cs">
+      <DependentUpon>frmEvaluaciones.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmEvaluaciones.aspx.designer.cs">
+      <DependentUpon>frmEvaluaciones.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\frmPuestos.aspx.cs">
       <DependentUpon>frmPuestos.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -303,12 +317,33 @@
     <Compile Include="Pages\frmPuestos.aspx.designer.cs">
       <DependentUpon>frmPuestos.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Pages\frmUsuarios.aspx.cs">
+      <DependentUpon>frmUsuarios.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\frmUsuarios.aspx.designer.cs">
+      <DependentUpon>frmUsuarios.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Pages\frmVacaciones.aspx.cs">
       <DependentUpon>frmVacaciones.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Pages\frmVacaciones.aspx.designer.cs">
       <DependentUpon>frmVacaciones.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Login.aspx.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Login.aspx.designer.cs">
+      <DependentUpon>Login.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Logout.aspx.cs">
+      <DependentUpon>Logout.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Logout.aspx.designer.cs">
+      <DependentUpon>Logout.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">

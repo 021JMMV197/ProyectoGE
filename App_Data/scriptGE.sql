@@ -1221,3 +1221,75 @@ INSERT INTO Empleado (Nombre, Apellido, FechaNacimiento, Telefono, Correo, Direc
 VALUES
 ('Ana', 'Gómez', '1990-05-10', '8888-8888', 'ana@example.com', 'Calle 123', '2024-01-15', 850.50, 1, 'seed'),
 ('Luis', 'Pérez', '1988-03-22', '7777-7777', 'luis@example.com', 'Av. 456', '2023-11-01', 920.00, 2, 'seed');
+go;
+
+
+ALTER PROCEDURE dbo.Vacaciones_List
+  @IdEmpleado INT = NULL,
+  @Estado     VARCHAR(20) = NULL,
+  @Desde      DATE = NULL,
+  @Hasta      DATE = NULL
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT *
+  FROM Vacaciones
+  WHERE (@IdEmpleado IS NULL OR IdEmpleado = @IdEmpleado)
+    AND (@Estado     IS NULL OR Estado = @Estado)
+    AND (@Desde      IS NULL OR FechaInicio >= @Desde)
+    AND (@Hasta      IS NULL OR FechaFin    <= @Hasta)
+  ORDER BY FechaInicio DESC, IdVacacion DESC;
+END
+GO
+
+ALTER PROCEDURE dbo.Asistencia_List
+  @IdEmpleado INT = NULL,
+  @Desde      DATE = NULL,
+  @Hasta      DATE = NULL
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT *
+  FROM Asistencia
+  WHERE (@IdEmpleado IS NULL OR IdEmpleado = @IdEmpleado)
+    AND (@Desde      IS NULL OR Fecha >= @Desde)
+    AND (@Hasta      IS NULL OR Fecha <= @Hasta)
+  ORDER BY Fecha DESC, IdAsistencia DESC;
+END
+GO
+
+ALTER PROCEDURE dbo.EmpleadoBeneficio_List
+  @IdEmpleado  INT = NULL,
+  @IdBeneficio INT = NULL,
+  @Estado      VARCHAR(20) = NULL
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT *
+  FROM EmpleadoBeneficio
+  WHERE (@IdEmpleado  IS NULL OR IdEmpleado  = @IdEmpleado)
+    AND (@IdBeneficio IS NULL OR IdBeneficio = @IdBeneficio)
+    AND (@Estado      IS NULL OR Estado      = @Estado)
+  ORDER BY FechaInicio DESC, IdEmpleadoBeneficio DESC;
+END
+GO
+
+ALTER PROCEDURE dbo.EvaluacionDesempeno_List
+  @IdEmpleado   INT  = NULL,
+  @Desde        DATE = NULL,  -- filtro por PeriodoInicio
+  @Hasta        DATE = NULL   -- filtro por PeriodoFin
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT *
+  FROM EvaluacionDesempeno
+  WHERE (@IdEmpleado IS NULL OR IdEmpleado = @IdEmpleado)
+    AND (@Desde      IS NULL OR PeriodoInicio >= @Desde)
+    AND (@Hasta      IS NULL OR PeriodoFin    <= @Hasta)
+  ORDER BY PeriodoFin DESC, IdEvaluacion DESC;
+END
+GO
