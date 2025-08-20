@@ -1293,3 +1293,32 @@ BEGIN
   ORDER BY PeriodoFin DESC, IdEvaluacion DESC;
 END
 GO
+
+-- Resumen de vacaciones por empleado (filtros opcionales)
+CREATE OR ALTER PROCEDURE dbo.Vacaciones_ReporteResumen
+  @Desde      DATE = NULL,
+  @Hasta      DATE = NULL,
+  @IdEmpleado INT  = NULL,
+  @Estado     VARCHAR(20) = NULL   -- opcional: 'Pendiente','Aprobado','Rechazado'
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  SELECT
+      v.IdEmpleado,
+      e.Nombre + ' ' + e.Apellido AS Empleado,
+      COUNT(*)                           AS Solicitudes,
+      SUM(v.CantidadDias)                AS TotalDias,
+      SUM(CASE WHEN v.Estado = 'Aprobado' THEN v.CantidadDias ELSE 0 END)   AS DiasAprobados,
+      SUM(CASE WHEN v.Estado = 'Pendiente' THEN v.CantidadDias ELSE 0 END)  AS DiasPendientes,
+      SUM(CASE WHEN v.Estado = 'Rechazado' THEN v.CantidadDias ELSE 0 END)  AS DiasRechazados
+  FROM Vacaciones v
+  INNER JOIN Empleado e ON e.IdEmpleado = v.IdEmpleado
+  WHERE (@IdEmpleado IS NULL OR v.IdEmpleado = @IdEmpleado)
+    AND (@Desde IS NULL OR v.FechaInicio >= @Desde)
+    AND (@Hasta IS NULL OR v.FechaFin    <= @Hasta)
+    AND (@Estado IS NULL OR v.Estado = @Estado)
+  GROUP BY v.IdEmpleado, e.Nombre, e.Apellido
+  ORDER BY TotalDias DESC, Empleado ASC;
+END
+GO

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ProyectoGE.Models
 {
+    // =======================
+    // DTOs (para deserializar)
+    // =======================
     public class VacacionesResumenView
     {
         public int IdEmpleado { get; set; }
@@ -18,9 +21,25 @@ namespace ProyectoGE.Models
         public int DiasRechazados { get; set; }
     }
 
+    public class AsistenciaResumenView
+    {
+        public int IdEmpleado { get; set; }
+        public string Empleado { get; set; }
+        public int Registros { get; set; }
+        public int LlegadasTarde { get; set; }
+        public int SinSalida { get; set; }
+        public int MinutosTrabajados { get; set; }
+        public int PromedioMinutosPorRegistro { get; set; }
+    }
+
+    // =======================
+    // Cliente de Reportes API
+    // =======================
     public class ReportesApiClient
     {
-        private readonly string _baseUrl = ConfigurationManager.AppSettings["ApiBaseUrl"];
+        // Normaliza con una barra al final
+        private readonly string _baseUrl =
+            ((ConfigurationManager.AppSettings["ApiBaseUrl"] ?? string.Empty).TrimEnd('/')) + "/";
 
         private HttpClient NewClient()
         {
@@ -30,21 +49,55 @@ namespace ProyectoGE.Models
             return http;
         }
 
-        public async Task<VacacionesResumenView[]> GetVacacionesResumenAsync(DateTime? desde, DateTime? hasta, int? idEmpleado, string estado)
+        private static string Append(string url, string name, string value, ref string sep)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                url += $"{sep}{name}={Uri.EscapeDataString(value)}";
+                sep = "&";
+            }
+            return url;
+        }
+
+        // -------- Vacaciones (resumen) --------
+        public async Task<VacacionesResumenView[]> GetVacacionesResumenAsync(
+            DateTime? desde, DateTime? hasta, int? idEmpleado, string estado)
         {
             using (var http = NewClient())
             {
                 var url = _baseUrl + "api/reportes/vacaciones-resumen";
                 var sep = "?";
-                if (desde.HasValue) { url += $"{sep}desde={desde:yyyy-MM-dd}"; sep = "&"; }
-                if (hasta.HasValue) { url += $"{sep}hasta={hasta:yyyy-MM-dd}"; sep = "&"; }
-                if (idEmpleado.HasValue) { url += $"{sep}idEmpleado={idEmpleado.Value}"; sep = "&"; }
-                if (!string.IsNullOrWhiteSpace(estado)) { url += $"{sep}estado={Uri.EscapeDataString(estado)}"; }
+
+                if (desde.HasValue) url = Append(url, "desde", desde.Value.ToString("yyyy-MM-dd"), ref sep);
+                if (hasta.HasValue) url = Append(url, "hasta", hasta.Value.ToString("yyyy-MM-dd"), ref sep);
+                if (idEmpleado.HasValue) url = Append(url, "idEmpleado", idEmpleado.Value.ToString(), ref sep);
+                url = Append(url, "estado", estado, ref sep);
 
                 var resp = await http.GetAsync(url);
                 resp.EnsureSuccessStatusCode();
                 var json = await resp.Content.ReadAsStringAsync();
                 return JsonConvert.DeserializeObject<VacacionesResumenView[]>(json);
+            }
+        }
+
+        // -------- Asistencia (resumen) --------
+        public async Task<AsistenciaResumenView[]> GetAsistenciaResumenAsync(
+            DateTime? desde, DateTime? hasta, int? idEmpleado, string horaTarde = "09:15")
+        {
+            using (var http = NewClient())
+            {
+                var url = _baseUrl + "api/reportes/asistencia-resumen";
+                var sep = "?";
+
+                if (desde.HasValue) url = Append(url, "desde", desde.Value.ToString("yyyy-MM-dd"), ref sep);
+                if (hasta.HasValue) url = Append(url, "hasta", hasta.Value.ToString("yyyy-MM-dd"), ref sep);
+                if (idEmpleado.HasValue) url = Append(url, "idEmpleado", idEmpleado.Value.ToString(), ref sep);
+                url = Append(url, "horaTarde", string.IsNullOrWhiteSpace(horaTarde) ? "09:15" : horaTarde, ref sep);
+
+                var resp = await http.GetAsync(url);
+                resp.EnsureSuccessStatusCode();
+                var json = await resp.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<AsistenciaResumenView[]>(json);
             }
         }
     }

@@ -17,13 +17,14 @@ using iText.Layout.Properties;
 
 namespace ProyectoGE.Pages
 {
-    public partial class rptVacaciones : System.Web.UI.Page
+    public partial class rptAsistencia : System.Web.UI.Page
     {
         private readonly ReportesApiClient _api = new ReportesApiClient();
         private readonly EmpleadoApiClient _empApi = new EmpleadoApiClient();
 
         protected void Page_Init(object sender, EventArgs e)
         {
+            // Si no has activado login aún, comenta esta línea temporalmente:
             if (AuthGuard.Require(this)) return;
         }
 
@@ -34,6 +35,7 @@ namespace ProyectoGE.Pages
                 await CargarEmpleadosAsync();
                 txtDesde.Text = new DateTime(DateTime.Today.Year, 1, 1).ToString("yyyy-MM-dd");
                 txtHasta.Text = DateTime.Today.ToString("yyyy-MM-dd");
+                if (string.IsNullOrWhiteSpace(txtHoraTarde.Text)) txtHoraTarde.Text = "09:15";
             }
         }
 
@@ -45,9 +47,9 @@ namespace ProyectoGE.Pages
                 int? idEmp = ParseIntNullable(ddlEmpleado.SelectedValue);
                 DateTime? desde = ParseFecha(txtDesde.Text);
                 DateTime? hasta = ParseFecha(txtHasta.Text);
-                string estado = ddlEstado.SelectedValue;
+                string horaTarde = string.IsNullOrWhiteSpace(txtHoraTarde.Text) ? "09:15" : txtHoraTarde.Text.Trim();
 
-                var data = await _api.GetVacacionesResumenAsync(desde, hasta, idEmp, estado);
+                var data = await _api.GetAsistenciaResumenAsync(desde, hasta, idEmp, horaTarde);
                 gvResumen.DataSource = data;
                 gvResumen.DataBind();
 
@@ -63,9 +65,9 @@ namespace ProyectoGE.Pages
         protected void btnLimpiar_Click(object sender, EventArgs e)
         {
             ddlEmpleado.SelectedIndex = 0;
-            ddlEstado.SelectedIndex = 0;
             txtDesde.Text = "";
             txtHasta.Text = "";
+            txtHoraTarde.Text = "09:15";
             gvResumen.DataSource = null;
             gvResumen.DataBind();
             lblMsg.Text = "";
@@ -79,45 +81,36 @@ namespace ProyectoGE.Pages
                 int? idEmp = ParseIntNullable(ddlEmpleado.SelectedValue);
                 DateTime? desde = ParseFecha(txtDesde.Text);
                 DateTime? hasta = ParseFecha(txtHasta.Text);
-                string estado = ddlEstado.SelectedValue;
+                string horaTarde = string.IsNullOrWhiteSpace(txtHoraTarde.Text) ? "09:15" : txtHoraTarde.Text.Trim();
 
-                var data = await _api.GetVacacionesResumenAsync(desde, hasta, idEmp, estado);
+                var data = await _api.GetAsistenciaResumenAsync(desde, hasta, idEmp, horaTarde);
                 if (data == null || data.Length == 0)
                 {
                     lblMsg.Text = "No hay datos para exportar.";
                     return;
                 }
 
-                byte[] pdfBytes = BuildVacacionesPdf_StandardFonts(
+                byte[] pdfBytes = BuildAsistenciaPdf_StandardFonts(
                     data,
                     desde, hasta,
                     idEmp.HasValue ? ddlEmpleado.SelectedItem.Text : "(Todos)",
-                    string.IsNullOrWhiteSpace(estado) ? "(Todos)" : estado
+                    horaTarde
                 );
 
                 Response.Clear();
                 Response.Buffer = true;
                 Response.ContentType = "application/pdf";
-                Response.AddHeader("content-disposition", "attachment;filename=VacacionesResumen.pdf");
+                Response.AddHeader("content-disposition", "attachment;filename=AsistenciaResumen.pdf");
                 Response.Cache.SetCacheability(HttpCacheability.NoCache);
                 Response.BinaryWrite(pdfBytes);
                 Response.Flush();
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
             }
-            catch (iText.Kernel.Exceptions.PdfException pex)
-            {
-                lblMsg.Text = "iText PdfException:<br/><pre>" + Server.HtmlEncode(pex.ToString()) + "</pre>";
-            }
             catch (Exception ex)
             {
-                lblMsg.Text = "Error al exportar:<br/><pre>" + Server.HtmlEncode(ex.ToString()) + "</pre>";
+                lblMsg.Text = "Error al exportar: " + ex.Message;
             }
         }
-
-
-
-
-
 
         // ================== Helpers ==================
 
@@ -145,8 +138,7 @@ namespace ProyectoGE.Pages
         private static DateTime? ParseFecha(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out var d)) return d;
+            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)) return d;
             if (DateTime.TryParse(s, out d)) return d;
             return null;
         }
@@ -157,18 +149,17 @@ namespace ProyectoGE.Pages
             return int.TryParse(s, out var v) ? v : (int?)null;
         }
 
-
-        private byte[] BuildVacacionesPdf_StandardFonts(
-            VacacionesResumenView[] data,
+        // ===== PDF con fuentes estándar (sin TTF, sin adapters) =====
+        private static byte[] BuildAsistenciaPdf_StandardFonts(
+            AsistenciaResumenView[] data,
             DateTime? desde, DateTime? hasta,
             string empleadoFiltro,
-            string estadoFiltro)
+            string horaTarde)
         {
             using (var ms = new System.IO.MemoryStream())
             {
-                var writer = new PdfWriter(ms);
-                
-                writer.SetSmartMode(false);
+                var writer = new PdfWriter(ms, new WriterProperties());
+                try { writer.SetSmartMode(false); } catch { /* ok en iText8 */ }
 
                 var pdf = new PdfDocument(writer);
                 pdf.SetDefaultPageSize(PageSize.A4);
@@ -176,64 +167,59 @@ namespace ProyectoGE.Pages
                 var doc = new Document(pdf);
                 doc.SetMargins(36, 36, 36, 36);
 
-                // Fuentes estándar (NO TTF, NO IDENTITY_H, NO adapter)
                 PdfFont font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
                 PdfFont fontBold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
 
-                // Título
-                doc.Add(new Paragraph("Reporte: Vacaciones (Resumen por Empleado)")
+                doc.Add(new Paragraph("Reporte: Asistencia (Resumen por Empleado)")
                     .SetFont(fontBold).SetFontSize(14).SetMarginBottom(8));
 
-                // Filtros
-                var filtros = $"Empleado: {empleadoFiltro}   Estado: {estadoFiltro}   " +
+                var filtros = $"Empleado: {empleadoFiltro}   " +
                               $"Desde: {(desde.HasValue ? desde.Value.ToString("yyyy-MM-dd") : "(N/D)")}   " +
-                              $"Hasta: {(hasta.HasValue ? hasta.Value.ToString("yyyy-MM-dd") : "(N/D)")}";
+                              $"Hasta: {(hasta.HasValue ? hasta.Value.ToString("yyyy-MM-dd") : "(N/D)")}   " +
+                              $"Hora tarde: {horaTarde}";
                 doc.Add(new Paragraph(filtros).SetFont(font).SetFontSize(10).SetMarginBottom(10));
 
-                // Tabla
-                float[] widths = { 12, 30, 12, 12, 12, 12, 12 };
+                float[] widths = { 12, 28, 12, 12, 12, 12, 12 };
                 var table = new Table(UnitValue.CreatePercentArray(widths)).UseAllAvailableWidth();
 
-                AddHeaderCell(table, "Empleado ID", fontBold);
+                AddHeaderCell(table, "ID", fontBold);
                 AddHeaderCell(table, "Empleado", fontBold);
-                AddHeaderCell(table, "Solic.", fontBold);
-                AddHeaderCell(table, "Total", fontBold);
-                AddHeaderCell(table, "Aprob.", fontBold);
-                AddHeaderCell(table, "Pend.", fontBold);
-                AddHeaderCell(table, "Rech.", fontBold);
+                AddHeaderCell(table, "Reg.", fontBold);
+                AddHeaderCell(table, "Tarde", fontBold);
+                AddHeaderCell(table, "Sin Sal.", fontBold);
+                AddHeaderCell(table, "Min. Trab.", fontBold);
+                AddHeaderCell(table, "Prom./Reg.", fontBold);
 
-                int tSolic = 0, tTotal = 0, tApr = 0, tPen = 0, tRec = 0;
+                int tReg = 0, tTar = 0, tSin = 0, tMin = 0, tProm = 0;
 
                 foreach (var r in data)
                 {
                     AddCell(table, r.IdEmpleado.ToString(), font, TextAlignment.LEFT);
                     AddCell(table, r.Empleado ?? "", font, TextAlignment.LEFT);
-                    AddCell(table, r.Solicitudes.ToString(), font, TextAlignment.RIGHT);
-                    AddCell(table, r.TotalDias.ToString(), font, TextAlignment.RIGHT);
-                    AddCell(table, r.DiasAprobados.ToString(), font, TextAlignment.RIGHT);
-                    AddCell(table, r.DiasPendientes.ToString(), font, TextAlignment.RIGHT);
-                    AddCell(table, r.DiasRechazados.ToString(), font, TextAlignment.RIGHT);
+                    AddCell(table, r.Registros.ToString(), font, TextAlignment.RIGHT);
+                    AddCell(table, r.LlegadasTarde.ToString(), font, TextAlignment.RIGHT);
+                    AddCell(table, r.SinSalida.ToString(), font, TextAlignment.RIGHT);
+                    AddCell(table, r.MinutosTrabajados.ToString(), font, TextAlignment.RIGHT);
+                    AddCell(table, r.PromedioMinutosPorRegistro.ToString(), font, TextAlignment.RIGHT);
 
-                    tSolic += r.Solicitudes;
-                    tTotal += r.TotalDias;
-                    tApr += r.DiasAprobados;
-                    tPen += r.DiasPendientes;
-                    tRec += r.DiasRechazados;
+                    tReg += r.Registros;
+                    tTar += r.LlegadasTarde;
+                    tSin += r.SinSalida;
+                    tMin += r.MinutosTrabajados;
+                    tProm += r.PromedioMinutosPorRegistro;
                 }
 
-                // Totales
                 var tot = new Cell(1, 2)
                     .Add(new Paragraph("Totales").SetFont(fontBold).SetFontSize(9))
                     .SetBackgroundColor(ColorConstants.LIGHT_GRAY)
                     .SetPadding(4)
                     .SetTextAlignment(TextAlignment.LEFT);
                 table.AddCell(tot);
-
-                AddCell(table, tSolic.ToString(), fontBold, TextAlignment.RIGHT);
-                AddCell(table, tTotal.ToString(), fontBold, TextAlignment.RIGHT);
-                AddCell(table, tApr.ToString(), fontBold, TextAlignment.RIGHT);
-                AddCell(table, tPen.ToString(), fontBold, TextAlignment.RIGHT);
-                AddCell(table, tRec.ToString(), fontBold, TextAlignment.RIGHT);
+                AddCell(table, tReg.ToString(), fontBold, TextAlignment.RIGHT);
+                AddCell(table, tTar.ToString(), fontBold, TextAlignment.RIGHT);
+                AddCell(table, tSin.ToString(), fontBold, TextAlignment.RIGHT);
+                AddCell(table, tMin.ToString(), fontBold, TextAlignment.RIGHT);
+                AddCell(table, (data.Length > 0 ? (tProm / data.Length) : 0).ToString(), fontBold, TextAlignment.RIGHT);
 
                 doc.Add(table);
                 doc.Close();
