@@ -23,6 +23,11 @@
     <asp:Button ID="btnGenerar" runat="server" Text="Generar" OnClick="btnGenerar_Click" />
     <asp:Button ID="btnPdf" runat="server" Text="Exportar PDF" OnClick="btnPdf_Click" />
     <asp:Button ID="btnLimpiar"  runat="server" Text="Limpiar"  OnClick="btnLimpiar_Click" />
+    <asp:Button ID="btnAtras" runat="server"
+    Text="Atrás"
+    OnClick="btnAtras_Click"
+    CausesValidation="false" />
+
     <br /><br />
     <asp:Label ID="lblMsg" runat="server" ForeColor="Red" />
 

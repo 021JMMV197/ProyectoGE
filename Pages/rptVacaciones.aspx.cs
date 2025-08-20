@@ -260,5 +260,10 @@ namespace ProyectoGE.Pages
                 .SetTextAlignment(align)
                 .SetVerticalAlignment(VerticalAlignment.MIDDLE));
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

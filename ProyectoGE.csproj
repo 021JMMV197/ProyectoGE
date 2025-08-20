@@ -244,6 +244,7 @@
     <Content Include="Pages\frmVacaciones.aspx" />
     <Content Include="Pages\Login.aspx" />
     <Content Include="Pages\Logout.aspx" />
+    <Content Include="Pages\Menu.aspx" />
     <Content Include="Pages\rptAsistencia.aspx" />
     <Content Include="Pages\rptVacaciones.aspx" />
     <Content Include="Scripts\bootstrap.bundle.js" />
@@ -426,6 +427,13 @@
     </Compile>
     <Compile Include="Pages\Logout.aspx.designer.cs">
       <DependentUpon>Logout.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Menu.aspx.cs">
+      <DependentUpon>Menu.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Pages\Menu.aspx.designer.cs">
+      <DependentUpon>Menu.aspx</DependentUpon>
     </Compile>
     <Compile Include="Pages\rptAsistencia.aspx.cs">
       <DependentUpon>rptAsistencia.aspx</DependentUpon>

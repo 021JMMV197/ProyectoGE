@@ -171,5 +171,10 @@ namespace ProyectoGE.Pages
                 return new DateTime(f.Year, f.Month, f.Day, dt.Hour, dt.Minute, 0);
             return null;
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

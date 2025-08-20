@@ -104,5 +104,10 @@ namespace ProyectoGE.Pages
             txtRol.Text = "";
             txtPass.Text = "";
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

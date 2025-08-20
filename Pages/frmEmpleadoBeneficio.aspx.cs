@@ -182,5 +182,10 @@ namespace ProyectoGE.Pages
             if (DateTime.TryParse(s, out d)) return d;
             return null;
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

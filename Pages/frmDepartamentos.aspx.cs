@@ -101,5 +101,10 @@ namespace ProyectoGE.Pages
             txtNombre.Text = "";
             txtDescripcion.Text = "";
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

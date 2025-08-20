@@ -14,7 +14,7 @@ namespace ProyectoGE.Pages
             if (!IsPostBack && Session["Usuario"] != null)
             {
                 // Redirección segura (no aborta hilo)
-                var destino = ResolveUrl("~/Pages/frmEmpleados.aspx");
+                var destino = ResolveUrl("~/Pages/Menu.aspx");
                 Response.Redirect(destino, false);
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
                 return;
@@ -58,7 +58,7 @@ namespace ProyectoGE.Pages
                 }
                 else
                 {
-                    destino = "~/Pages/frmEmpleados.aspx";
+                    destino = "~/Pages/Menu.aspx";
                 }
 
                 Response.Redirect(ResolveUrl(destino), false);

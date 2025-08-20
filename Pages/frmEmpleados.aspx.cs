@@ -179,5 +179,10 @@ namespace ProyectoGE.Pages
         }
 
         private static int ParseInt(string s) => int.TryParse(s, out var v) ? v : 0;
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }

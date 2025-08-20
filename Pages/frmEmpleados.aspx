@@ -45,6 +45,11 @@
     <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" OnClick="btnEliminar_Click" />
     <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" OnClick="btnLimpiar_Click" />
     <asp:Button ID="btnCargar" runat="server" Text="Cargar" OnClick="btnCargar_Click" />
+    <asp:Button ID="btnAtras" runat="server"
+    Text="Atrás"
+    OnClick="btnAtras_Click"
+    CausesValidation="false" />
+
 
     <br /><br />
     <asp:Label ID="lblMsg" runat="server" ForeColor="Red" />

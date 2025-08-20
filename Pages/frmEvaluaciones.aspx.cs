@@ -174,5 +174,10 @@ namespace ProyectoGE.Pages
             if (string.IsNullOrWhiteSpace(s)) return null;
             int v; return int.TryParse(s, out v) ? v : (int?)null;
         }
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
     }
 }
