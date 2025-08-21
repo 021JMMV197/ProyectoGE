@@ -178,6 +178,17 @@ namespace ProyectoGE.Pages
         {
             Response.Redirect("~/Pages/Menu.aspx");
         }
+        protected string GetEmpleadoNombre(object idObj)
+        {
+            if (idObj == null) return string.Empty;
+            if (!int.TryParse(idObj.ToString(), out var id)) return string.Empty;
+
+            // IMPORTANTE: ddlEmpleado debe estar cargado (IdEmpleado/NombreCompleto)
+            // ANTES de hacer DataBind() del GridView para que esto funcione.
+            var item = ddlEmpleado.Items.FindByValue(id.ToString());
+            return item?.Text ?? string.Empty;
+        }
+
 
     }
 }

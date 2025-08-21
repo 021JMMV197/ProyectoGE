@@ -2,54 +2,97 @@
     Inherits="ProyectoGE.Pages.frmPuestos" Async="true" %>
 <!DOCTYPE html>
 <html>
-<head runat="server"><title>Puestos (API)</title></head>
+<head runat="server">
+  <title>Puestos (API)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Tema rosa -->
+  <link href="~/Styles/Estilo.css?v=3" rel="stylesheet" runat="server" />
+</head>
 <body>
-<form id="form1" runat="server">
-    <h2>Puestos</h2>
-    <asp:HiddenField ID="hfIdPuesto" runat="server" />
+<form id="form1" runat="server" class="container py-4">
 
-    <table>
-        <tr>
-            <td>Nombre:</td>
-            <td><asp:TextBox ID="txtNombre" runat="server" /></td>
-            <td>Descripción:</td>
-            <td><asp:TextBox ID="txtDescripcion" runat="server" Width="250px" /></td>
-        </tr>
-        <tr>
-            <td>Salario Base:</td>
-            <td><asp:TextBox ID="txtSalarioBase" runat="server" /></td>
-            <td>Departamento:</td>
-            <td><asp:DropDownList ID="ddlDepto" runat="server" DataTextField="Nombre" DataValueField="IdDepartamento"></asp:DropDownList></td>
-        </tr>
-    </table>
+  <asp:HiddenField ID="hfIdPuesto" runat="server" />
 
-    <asp:Button ID="btnCrear" runat="server" Text="Crear" OnClick="btnCrear_Click" />
-    <asp:Button ID="btnActualizar" runat="server" Text="Actualizar" OnClick="btnActualizar_Click" />
-    <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" OnClick="btnEliminar_Click" />
-    <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" OnClick="btnLimpiar_Click" />
-    <asp:Button ID="btnCargar" runat="server" Text="Cargar" OnClick="btnCargar_Click" />
-    <asp:Button ID="btnAtras" runat="server"
-    Text="Atrás"
-    OnClick="btnAtras_Click"
-    CausesValidation="false" />
+  <div class="card form-card">
+    <div class="card-header">
+      <h4 class="m-0">Puestos</h4>
+    </div>
 
-    <br /><br />
-    <asp:Label ID="lblMsg" runat="server" ForeColor="Red" />
-    <br />
-    <asp:Label ID="lblTotal" runat="server" Text="Total: 0" />
+    <div class="card-body">
+      <!-- Formulario -->
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label for="txtNombre" class="form-label">Nombre</label>
+          <asp:TextBox ID="txtNombre" runat="server" CssClass="form-control" />
+        </div>
 
-    <br /><br />
-    <asp:GridView ID="gvPuestos" runat="server" AutoGenerateColumns="False"
-        DataKeyNames="IdPuesto" OnSelectedIndexChanged="gvPuestos_SelectedIndexChanged">
-        <Columns>
+        <div class="col-12 col-md-6">
+          <label for="txtDescripcion" class="form-label">Descripción</label>
+          <asp:TextBox ID="txtDescripcion" runat="server" CssClass="form-control" />
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label for="txtSalarioBase" class="form-label">Salario Base</label>
+          <asp:TextBox ID="txtSalarioBase" runat="server" CssClass="form-control" />
+        </div>
+
+        <div class="col-12 col-md-8">
+          <label for="ddlDepto" class="form-label">Departamento</label>
+          <asp:DropDownList ID="ddlDepto" runat="server"
+                            DataTextField="Nombre" DataValueField="IdDepartamento"
+                            CssClass="form-select" />
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="d-flex flex-wrap gap-2 mt-3">
+        <asp:Button ID="btnCrear" runat="server" Text="Crear" CssClass="btn btn-pink" OnClick="btnCrear_Click" />
+        <asp:Button ID="btnActualizar" runat="server" Text="Actualizar" CssClass="btn btn-pink" OnClick="btnActualizar_Click" />
+        <asp:Button ID="btnEliminar" runat="server" Text="Eliminar" CssClass="btn btn-outline-light" OnClick="btnEliminar_Click" />
+        <asp:Button ID="btnLimpiar" runat="server" Text="Limpiar" CssClass="btn btn-outline-light" OnClick="btnLimpiar_Click" />
+        <asp:Button ID="btnCargar" runat="server" Text="Cargar" CssClass="btn btn-outline-light" OnClick="btnCargar_Click" />
+        <asp:Button ID="btnAtras" runat="server" Text="Atrás" CssClass="btn btn-outline-light"
+                    OnClick="btnAtras_Click" CausesValidation="false" />
+      </div>
+
+      <div class="mt-3">
+        <asp:Label ID="lblMsg" runat="server" CssClass="text-light d-block" />
+        <asp:Label ID="lblTotal" runat="server" CssClass="text-light d-block" Text="Total: 0" />
+      </div>
+
+      <!-- Grilla -->
+      <div class="table-responsive mt-3">
+        <asp:GridView ID="gvPuestos" runat="server" AutoGenerateColumns="False"
+                      CssClass="table table-striped table-bordered table-sm"
+                      DataKeyNames="IdPuesto"
+                      OnSelectedIndexChanged="gvPuestos_SelectedIndexChanged"
+                      GridLines="None">
+          <Columns>
             <asp:CommandField ShowSelectButton="true" SelectText="Editar" />
             <asp:BoundField DataField="IdPuesto" HeaderText="ID" />
             <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
             <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
             <asp:BoundField DataField="SalarioBase" HeaderText="Salario Base" DataFormatString="{0:N2}" />
-            <asp:BoundField DataField="IdDepartamento" HeaderText="Depto" />
-        </Columns>
-    </asp:GridView>
+
+            <%-- Reemplazo: en vez de IdDepartamento, mostramos el nombre --%>
+            <asp:TemplateField HeaderText="Departamento">
+              <ItemTemplate>
+                <%# GetDeptoNombre(Eval("IdDepartamento")) %>
+              </ItemTemplate>
+            </asp:TemplateField>
+          </Columns>
+          <HeaderStyle CssClass="table-dark" />
+        </asp:GridView>
+      </div>
+    </div>
+  </div>
+
+  <!-- (Opcional) Bootstrap JS -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 </form>
 </body>
 </html>

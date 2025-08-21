@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using ProyectoGE.Infrastructure;
 
+
 namespace ProyectoGE.Pages
 {
     public partial class frmEmpleados : System.Web.UI.Page

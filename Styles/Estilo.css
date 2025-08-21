@@ -1,0 +1,69 @@
+﻿:root {
+    --pink-dark: #9d174d; /* rosa oscuro (botones) */
+    --pink-mid: #db2777; /* rosa medio  (formularios) */
+    --pink-light: #fde2ef; /* rosa claro  (fondo) */
+}
+
+/* Fondo general */
+body {
+    font-family: Segoe UI, Arial, sans-serif;
+    background-color: var(--pink-light);
+}
+
+/* -------- Formularios (tarjetas) en rosa medio -------- */
+.form-card {
+    background-color: var(--pink-mid);
+    color: #fff;
+    border: 0;
+    border-radius: .75rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+    .form-card .card-header {
+        background-color: var(--pink-mid);
+        color: #fff;
+        border-bottom: 1px solid rgba(255,255,255,.25);
+        border-top-left-radius: .75rem;
+        border-top-right-radius: .75rem;
+    }
+
+    .form-card .card-body {
+        background-color: var(--pink-mid);
+    }
+
+    .form-card label {
+        color: #fff;
+    }
+
+    .form-card .form-control,
+    .form-card .form-select {
+        background-color: #fff;
+        color: #111;
+        border-color: #f8d0e0; /* borde sutil rosado */
+    }
+
+        .form-card .form-control::placeholder {
+            color: #6b7280;
+        }
+
+/* -------- Botones rosa oscuro -------- */
+.btn-pink {
+    background-color: var(--pink-dark) !important;
+    border-color: var(--pink-dark) !important;
+    color: #fff !important;
+}
+
+    .btn-pink:hover {
+        filter: brightness(0.92);
+    }
+
+/* Foco de inputs (general) */
+.form-control:focus {
+    border-color: var(--pink-mid);
+    box-shadow: 0 0 0 .2rem rgba(219,39,119,.25);
+}
+
+/* Utilidad opcional si quieres usarla en otras vistas */
+.bg-rosa-claro {
+    background-color: var(--pink-light) !important;
+}

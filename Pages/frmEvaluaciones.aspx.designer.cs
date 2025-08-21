@@ -69,15 +69,6 @@ namespace ProyectoGE.Pages
         protected global::System.Web.UI.WebControls.TextBox txtCalif;
 
         /// <summary>
-        /// txtComentarios control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtComentarios;
-
-        /// <summary>
         /// txtEvaluador control.
         /// </summary>
         /// <remarks>
@@ -85,6 +76,15 @@ namespace ProyectoGE.Pages
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtEvaluador;
+
+        /// <summary>
+        /// txtComentarios control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtComentarios;
 
         /// <summary>
         /// btnCrear control.

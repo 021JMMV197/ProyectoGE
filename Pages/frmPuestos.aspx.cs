@@ -144,6 +144,16 @@ namespace ProyectoGE.Pages
         {
             Response.Redirect("~/Pages/Menu.aspx");
         }
+        protected string GetDeptoNombre(object idObj)
+        {
+            if (idObj == null) return string.Empty;
+            if (!int.TryParse(idObj.ToString(), out var id)) return string.Empty;
+
+            // ddlDepto debe estar cargado con IdDepartamento -> Nombre antes de DataBind del Grid
+            var item = ddlDepto.Items.FindByValue(id.ToString());
+            return item?.Text ?? string.Empty;
+        }
+
 
     }
 }
