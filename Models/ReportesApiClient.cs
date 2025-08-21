@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProyectoGE.Models
 {
-    // =======================
-    // DTOs (para deserializar)
-    // =======================
+   
     public class VacacionesResumenView
     {
         public int IdEmpleado { get; set; }
@@ -32,12 +30,10 @@ namespace ProyectoGE.Models
         public int PromedioMinutosPorRegistro { get; set; }
     }
 
-    // =======================
-    // Cliente de Reportes API
-    // =======================
+   
     public class ReportesApiClient
     {
-        // Normaliza con una barra al final
+        
         private readonly string _baseUrl =
             ((ConfigurationManager.AppSettings["ApiBaseUrl"] ?? string.Empty).TrimEnd('/')) + "/";
 

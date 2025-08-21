@@ -1322,3 +1322,39 @@ BEGIN
   ORDER BY TotalDias DESC, Empleado ASC;
 END
 GO
+
+CREATE PROCEDURE dbo.Reporte_AsistenciaResumen
+  @Desde DATE = NULL,
+  @Hasta DATE = NULL,
+  @IdEmpleado INT = NULL,
+  @HoraTarde TIME = '09:15'
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  ;WITH F AS (
+    SELECT 
+      a.IdEmpleado,
+      e.Nombre + ' ' + e.Apellido AS Empleado,
+      COUNT(*) AS Registros,
+      SUM(CASE WHEN a.HoraEntrada IS NOT NULL AND a.HoraSalida IS NOT NULL 
+           THEN DATEDIFF(MINUTE, a.HoraEntrada, a.HoraSalida) ELSE 0 END) AS MinutosTrabajados,
+      SUM(CASE WHEN a.HoraEntrada IS NOT NULL AND CAST(a.HoraEntrada AS time) > @HoraTarde 
+           THEN 1 ELSE 0 END) AS LlegadasTarde,
+      SUM(CASE WHEN a.HoraSalida IS NULL THEN 1 ELSE 0 END) AS SinSalida
+    FROM Asistencia a
+    INNER JOIN Empleado e ON e.IdEmpleado = a.IdEmpleado
+    WHERE (@Desde IS NULL OR a.Fecha >= @Desde)
+      AND (@Hasta IS NULL OR a.Fecha <= @Hasta)
+      AND (@IdEmpleado IS NULL OR a.IdEmpleado = @IdEmpleado)
+    GROUP BY a.IdEmpleado, e.Nombre, e.Apellido
+  )
+  SELECT 
+    IdEmpleado, Empleado, Registros, LlegadasTarde, SinSalida,
+    MinutosTrabajados,
+    CAST(CASE WHEN Registros = 0 THEN 0 
+         ELSE (MinutosTrabajados * 1.0) / Registros END AS INT) AS PromedioMinutosPorRegistro
+  FROM F
+  ORDER BY Empleado;
+END
+GO

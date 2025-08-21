@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace ProyectoGE.Models
 {
-    // NO declarar PagedResult aquí (ya existe en el proyecto)
+    
 
     public class EmpleadoView
     {

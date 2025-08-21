@@ -42,10 +42,10 @@ namespace ProyectoGE.Models
                 conn.Open();
                 using (var rdr = cmd.ExecuteReader())
                 {
-                    // 1er resultset: Total
+                   
                     if (rdr.Read()) result.Total = rdr.GetInt32(0);
 
-                    // 2do resultset: Items
+                    
                     if (rdr.NextResult())
                     {
                         while (rdr.Read())
