@@ -1,5 +1,6 @@
 ﻿using ProyectoGE.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,23 @@ namespace ProyectoGE.Pages
         private readonly EvaluacionApiClient _api = new EvaluacionApiClient();
         private readonly EmpleadoApiClient _empApi = new EmpleadoApiClient();
 
-        private class EmpleadoItem { public int IdEmpleado { get; set; } public string NombreCompleto { get; set; } }
+        private class GridRow
+        {
+            public int IdEvaluacion { get; set; }
+            public int IdEmpleado { get; set; }
+            public string EmpleadoNombre { get; set; }
+            public DateTime? PeriodoInicio { get; set; }
+            public DateTime? PeriodoFin { get; set; }
+            public decimal? Calificacion { get; set; }
+            public int? IdEvaluador { get; set; }
+            public string Comentarios { get; set; }
+        }
+
+        private class EmpleadoItem
+        {
+            public int IdEmpleado { get; set; }
+            public string NombreCompleto { get; set; }
+        }
 
         protected async void Page_Load(object sender, EventArgs e)
         {
@@ -19,6 +36,63 @@ namespace ProyectoGE.Pages
             {
                 await CargarEmpleadosAsync();
                 await CargarAsync();
+            }
+        }
+
+        private async Task CargarAsync()
+        {
+            try
+            {
+                var empPaged = await _empApi.ListAsync(1, 1000);
+                var empDict = empPaged.Items.ToDictionary(
+                    e => e.IdEmpleado,
+                    e => $"{e.Nombre ?? ""} {e.Apellido ?? ""}".Trim()
+                );
+
+                var lista = await _api.ListAsync(); 
+
+                var rows = lista.Select(x => new GridRow
+                {
+                    IdEvaluacion = x.IdEvaluacion,
+                    IdEmpleado = x.IdEmpleado,
+                    EmpleadoNombre = empDict.ContainsKey(x.IdEmpleado) ? empDict[x.IdEmpleado] : "",
+                    PeriodoInicio = x.PeriodoInicio,
+                    PeriodoFin = x.PeriodoFin,
+                    Calificacion = x.Calificacion,
+                    IdEvaluador = x.IdEvaluador,
+                    Comentarios = x.Comentarios
+                }).ToList();
+
+                gvEval.DataSource = rows;
+                gvEval.DataBind();
+                lblTotal.Text = "Total: " + rows.Count;
+            }
+            catch (Exception ex)
+            {
+                lblMsg.Text = "Error al cargar: " + ex.Message;
+            }
+        }
+
+        private async Task CargarEmpleadosAsync()
+        {
+            try
+            {
+                var r = await _empApi.ListAsync(1, 1000);
+                var lista = r.Items
+                    .Select(x => new EmpleadoItem
+                    {
+                        IdEmpleado = x.IdEmpleado,
+                        NombreCompleto = ((x.Nombre ?? "") + " " + (x.Apellido ?? "")).Trim()
+                    })
+                    .OrderBy(x => x.NombreCompleto)
+                    .ToList();
+
+                ddlEmpleado.DataSource = lista;
+                ddlEmpleado.DataBind();
+            }
+            catch (Exception ex)
+            {
+                lblMsg.Text = "Error al cargar empleados: " + ex.Message;
             }
         }
 
@@ -31,131 +105,136 @@ namespace ProyectoGE.Pages
                 var dto = new EvaluacionCreateDto
                 {
                     IdEmpleado = int.Parse(ddlEmpleado.SelectedValue),
+
                     PeriodoInicio = ParseFecha(txtInicio.Text) ?? DateTime.Today,
                     PeriodoFin = ParseFecha(txtFin.Text) ?? DateTime.Today,
                     Calificacion = ParseDecimal(txtCalif.Text) ?? 0m,
-                    Comentarios = string.IsNullOrWhiteSpace(txtComentarios.Text) ? null : txtComentarios.Text.Trim(),
+
                     IdEvaluador = ParseIntNullable(txtEvaluador.Text),
+
+                    Comentarios = string.IsNullOrWhiteSpace(txtComentarios.Text) ? null : txtComentarios.Text.Trim(),
                     Adicionado_Por = "webforms"
                 };
-                if (dto.PeriodoFin < dto.PeriodoInicio) { lblMsg.Text = "Fin < Inicio."; return; }
-                if (dto.Calificacion < 0 || dto.Calificacion > 10) { lblMsg.Text = "Calificación 0..10."; return; }
 
-                int id = await _api.CreateAsync(dto);
+                var id = await _api.CreateAsync(dto);
                 lblMsg.Text = "Creado Id = " + id;
                 Limpiar();
                 await CargarAsync();
             }
-            catch (Exception ex) { lblMsg.Text = "Error al crear: " + ex.Message; }
+            catch (Exception ex)
+            {
+                lblMsg.Text = "Error al crear: " + ex.Message;
+            }
         }
 
         protected async void btnActualizar_Click(object sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrEmpty(hfIdEval.Value)) { lblMsg.Text = "Selecciona un registro."; return; }
+                if (string.IsNullOrEmpty(hfIdEval.Value))
+                {
+                    lblMsg.Text = "Selecciona un registro.";
+                    return;
+                }
 
                 var dto = new EvaluacionUpdateDto
                 {
                     IdEvaluacion = int.Parse(hfIdEval.Value),
                     IdEmpleado = int.Parse(ddlEmpleado.SelectedValue),
+
                     PeriodoInicio = ParseFecha(txtInicio.Text) ?? DateTime.Today,
                     PeriodoFin = ParseFecha(txtFin.Text) ?? DateTime.Today,
                     Calificacion = ParseDecimal(txtCalif.Text) ?? 0m,
-                    Comentarios = string.IsNullOrWhiteSpace(txtComentarios.Text) ? null : txtComentarios.Text.Trim(),
+
                     IdEvaluador = ParseIntNullable(txtEvaluador.Text),
+                    Comentarios = string.IsNullOrWhiteSpace(txtComentarios.Text) ? null : txtComentarios.Text.Trim(),
                     Modificado_Por = "webforms"
                 };
-                if (dto.PeriodoFin < dto.PeriodoInicio) { lblMsg.Text = "Fin < Inicio."; return; }
-                if (dto.Calificacion < 0 || dto.Calificacion > 10) { lblMsg.Text = "Calificación 0..10."; return; }
 
-                bool ok = await _api.UpdateAsync(dto);
+                var ok = await _api.UpdateAsync(dto);
                 lblMsg.Text = ok ? "Actualizado." : "No encontrado.";
                 await CargarAsync();
             }
-            catch (Exception ex) { lblMsg.Text = "Error al actualizar: " + ex.Message; }
+            catch (Exception ex)
+            {
+                lblMsg.Text = "Error al actualizar: " + ex.Message;
+            }
         }
 
         protected async void btnEliminar_Click(object sender, EventArgs e)
         {
             try
             {
-                if (string.IsNullOrEmpty(hfIdEval.Value)) { lblMsg.Text = "Selecciona un registro."; return; }
-                bool ok = await _api.DeleteAsync(int.Parse(hfIdEval.Value));
+                if (string.IsNullOrEmpty(hfIdEval.Value))
+                {
+                    lblMsg.Text = "Selecciona un registro.";
+                    return;
+                }
+
+                var ok = await _api.DeleteAsync(int.Parse(hfIdEval.Value));
                 lblMsg.Text = ok ? "Eliminado." : "No encontrado.";
                 Limpiar();
                 await CargarAsync();
             }
-            catch (Exception ex) { lblMsg.Text = "Error al eliminar: " + ex.Message; }
-        }
-
-        protected void btnLimpiar_Click(object sender, EventArgs e) { Limpiar(); lblMsg.Text = ""; }
-
-        protected void gvEval_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            var row = gvEval.SelectedRow; if (row == null) return;
-            hfIdEval.Value = gvEval.SelectedDataKey.Value.ToString();
-
-            // celdas: 0=select,1=ID,2=IdEmpleado,3=Inicio,4=Fin,5=Calif,6=EvaluadorId,7=Comentarios
-            txtInicio.Text = row.Cells[3].Text == "&nbsp;" ? "" : row.Cells[3].Text;
-            txtFin.Text = row.Cells[4].Text == "&nbsp;" ? "" : row.Cells[4].Text;
-            txtCalif.Text = row.Cells[5].Text == "&nbsp;" ? "" : row.Cells[5].Text;
-            txtEvaluador.Text = row.Cells[6].Text == "&nbsp;" ? "" : row.Cells[6].Text;
-            txtComentarios.Text = row.Cells[7].Text == "&nbsp;" ? "" : row.Cells[7].Text;
-
-            var empIdText = row.Cells[2].Text == "&nbsp;" ? "" : row.Cells[2].Text;
-            int empId;
-            if (int.TryParse(empIdText, out empId))
+            catch (Exception ex)
             {
-                var item = ddlEmpleado.Items.FindByValue(empId.ToString());
-                if (item != null) ddlEmpleado.SelectedValue = empId.ToString();
+                lblMsg.Text = "Error al eliminar: " + ex.Message;
             }
         }
 
-        private async Task CargarAsync()
+        protected void btnLimpiar_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var lista = await _api.ListAsync();
-                gvEval.DataSource = lista;
-                gvEval.DataBind();
-                lblTotal.Text = "Total: " + (lista == null ? 0 : lista.Length);
-            }
-            catch (Exception ex) { lblMsg.Text = "Error al cargar: " + ex.Message; }
-        }
-
-        private async Task CargarEmpleadosAsync()
-        {
-            try
-            {
-                var r = await _empApi.ListAsync(1, 500);
-                var lista = r.Items.Select(x => new EmpleadoItem
-                {
-                    IdEmpleado = x.IdEmpleado,
-                    NombreCompleto = (x.Nombre ?? "") + " " + (x.Apellido ?? "")
-                }).ToList();
-                ddlEmpleado.DataSource = lista;
-                ddlEmpleado.DataBind();
-            }
-            catch (Exception ex) { lblMsg.Text = "Error al cargar empleados: " + ex.Message; }
+            Limpiar();
+            lblMsg.Text = "";
         }
 
         private void Limpiar()
         {
             hfIdEval.Value = "";
             if (ddlEmpleado.Items.Count > 0) ddlEmpleado.SelectedIndex = 0;
-            txtInicio.Text = DateTime.Today.ToString("yyyy-MM-dd");
+            txtInicio.Text = "";
             txtFin.Text = "";
             txtCalif.Text = "";
             txtEvaluador.Text = "";
             txtComentarios.Text = "";
         }
 
+        protected void gvEval_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var keys = gvEval.SelectedDataKey?.Values;
+            if (keys == null) return;
+
+            hfIdEval.Value = keys["IdEvaluacion"]?.ToString() ?? "";
+
+            var idEmp = keys["IdEmpleado"]?.ToString() ?? "";
+            if (!string.IsNullOrEmpty(idEmp) && ddlEmpleado.Items.FindByValue(idEmp) != null)
+                ddlEmpleado.SelectedValue = idEmp;
+
+            var ini = keys["PeriodoInicio"];
+            var fin = keys["PeriodoFin"];
+            txtInicio.Text = (ini == null || ini is DBNull) ? "" : Convert.ToDateTime(ini).ToString("yyyy-MM-dd");
+            txtFin.Text = (fin == null || fin is DBNull) ? "" : Convert.ToDateTime(fin).ToString("yyyy-MM-dd");
+
+            var cal = keys["Calificacion"];
+            txtCalif.Text = (cal == null || cal is DBNull) ? "" : Convert.ToDecimal(cal).ToString(CultureInfo.InvariantCulture);
+
+            var idEval = keys["IdEvaluador"];
+            txtEvaluador.Text = (idEval == null || idEval is DBNull) ? "" : idEval.ToString();
+
+            var com = keys["Comentarios"];
+            txtComentarios.Text = (com == null || com is DBNull) ? "" : com.ToString();
+        }
+
+        protected void btnAtras_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Pages/Menu.aspx");
+        }
+
         private static DateTime? ParseFecha(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            DateTime d;
-            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out d)) return d;
+            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture,
+                                       DateTimeStyles.None, out var d)) return d;
             if (DateTime.TryParse(s, out d)) return d;
             return null;
         }
@@ -163,8 +242,7 @@ namespace ProyectoGE.Pages
         private static decimal? ParseDecimal(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            decimal v;
-            if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out v)) return v;
+            if (decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var v)) return v;
             if (decimal.TryParse(s, out v)) return v;
             return null;
         }
@@ -172,23 +250,7 @@ namespace ProyectoGE.Pages
         private static int? ParseIntNullable(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            int v; return int.TryParse(s, out v) ? v : (int?)null;
+            return int.TryParse(s, out var v) ? v : (int?)null;
         }
-        protected void btnAtras_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/Pages/Menu.aspx");
-        }
-        protected string GetEmpleadoNombre(object idObj)
-        {
-            if (idObj == null) return string.Empty;
-            if (!int.TryParse(idObj.ToString(), out var id)) return string.Empty;
-
-            // IMPORTANTE: ddlEmpleado debe estar cargado (IdEmpleado/NombreCompleto)
-            // ANTES de hacer DataBind() del GridView para que esto funcione.
-            var item = ddlEmpleado.Items.FindByValue(id.ToString());
-            return item?.Text ?? string.Empty;
-        }
-
-
     }
 }

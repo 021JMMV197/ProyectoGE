@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="frmEmpleadoBeneficio.aspx.cs"
+﻿﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="frmEmpleadoBeneficio.aspx.cs"
     Inherits="ProyectoGE.Pages.frmEmpleadoBeneficio" Async="true" %>
 <!DOCTYPE html>
 <html>
@@ -102,8 +102,7 @@
     </div>
   </div>
 
-  <!-- (Opcional) Bootstrap JS si usas componentes dinámicos -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+
 </form>
 </body>
 </html>

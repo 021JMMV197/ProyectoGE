@@ -1,7 +1,7 @@
 ﻿using ProyectoGE.Models;
 using ProyectoGE.Infrastructure;
 using System;
-using System.Web;           // <- para HttpContext
+using System.Web;           
 
 namespace ProyectoGE.Pages
 {
@@ -13,7 +13,6 @@ namespace ProyectoGE.Pages
         {
             if (!IsPostBack && Session["Usuario"] != null)
             {
-                // Redirección segura (no aborta hilo)
                 var destino = ResolveUrl("~/Pages/Menu.aspx");
                 Response.Redirect(destino, false);
                 HttpContext.Current.ApplicationInstance.CompleteRequest();
@@ -47,14 +46,13 @@ namespace ProyectoGE.Pages
 
                 AuthGuard.SignIn(this, u);
 
-                // Validar returnUrl (solo URLs locales y con .aspx)
                 var returnUrl = Request.QueryString["returnUrl"];
                 string destino;
                 if (!string.IsNullOrWhiteSpace(returnUrl)
                     && returnUrl.StartsWith("/", StringComparison.OrdinalIgnoreCase)
                     && returnUrl.EndsWith(".aspx", StringComparison.OrdinalIgnoreCase))
                 {
-                    destino = returnUrl; // e.g. /Pages/frmEmpleados.aspx
+                    destino = returnUrl; 
                 }
                 else
                 {

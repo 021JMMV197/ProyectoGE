@@ -176,21 +176,17 @@ namespace ProyectoGE.Pages
                 var doc = new Document(pdf);
                 doc.SetMargins(36, 36, 36, 36);
 
-                // Fuentes estándar (NO TTF, NO IDENTITY_H, NO adapter)
                 PdfFont font = PdfFontFactory.CreateFont(StandardFonts.HELVETICA);
                 PdfFont fontBold = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
 
-                // Título
                 doc.Add(new Paragraph("Reporte: Vacaciones (Resumen por Empleado)")
                     .SetFont(fontBold).SetFontSize(14).SetMarginBottom(8));
 
-                // Filtros
                 var filtros = $"Empleado: {empleadoFiltro}   Estado: {estadoFiltro}   " +
                               $"Desde: {(desde.HasValue ? desde.Value.ToString("yyyy-MM-dd") : "(N/D)")}   " +
                               $"Hasta: {(hasta.HasValue ? hasta.Value.ToString("yyyy-MM-dd") : "(N/D)")}";
                 doc.Add(new Paragraph(filtros).SetFont(font).SetFontSize(10).SetMarginBottom(10));
 
-                // Tabla
                 float[] widths = { 12, 30, 12, 12, 12, 12, 12 };
                 var table = new Table(UnitValue.CreatePercentArray(widths)).UseAllAvailableWidth();
 
@@ -221,7 +217,7 @@ namespace ProyectoGE.Pages
                     tRec += r.DiasRechazados;
                 }
 
-                // Totales
+                
                 var tot = new Cell(1, 2)
                     .Add(new Paragraph("Totales").SetFont(fontBold).SetFontSize(9))
                     .SetBackgroundColor(ColorConstants.LIGHT_GRAY)

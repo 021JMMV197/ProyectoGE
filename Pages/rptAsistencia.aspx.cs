@@ -24,7 +24,6 @@ namespace ProyectoGE.Pages
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            // Si no has activado login aún, comenta esta línea temporalmente:
             if (AuthGuard.Require(this)) return;
         }
 
@@ -149,7 +148,6 @@ namespace ProyectoGE.Pages
             return int.TryParse(s, out var v) ? v : (int?)null;
         }
 
-        // ===== PDF con fuentes estándar (sin TTF, sin adapters) =====
         private static byte[] BuildAsistenciaPdf_StandardFonts(
             AsistenciaResumenView[] data,
             DateTime? desde, DateTime? hasta,
@@ -159,7 +157,7 @@ namespace ProyectoGE.Pages
             using (var ms = new System.IO.MemoryStream())
             {
                 var writer = new PdfWriter(ms, new WriterProperties());
-                try { writer.SetSmartMode(false); } catch { /* ok en iText8 */ }
+                try { writer.SetSmartMode(false); } catch {  }
 
                 var pdf = new PdfDocument(writer);
                 pdf.SetDefaultPageSize(PageSize.A4);

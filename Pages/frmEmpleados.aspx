@@ -7,9 +7,8 @@
   <title>Gestión de Empleados (API)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
   <link href="~/Styles/Estilo.css?v=3" rel="stylesheet" runat="server" />
 </head>
 <body>
@@ -85,7 +84,7 @@
       <div class="table-responsive mt-3">
         <asp:GridView ID="gvEmpleados" runat="server" AutoGenerateColumns="False"
                       CssClass="table table-striped table-bordered table-sm"
-                      DataKeyNames="IdEmpleado"
+                      DataKeyNames="IdEmpleado,IdDepartamento"
                       OnSelectedIndexChanged="gvEmpleados_SelectedIndexChanged"
                       GridLines="None">
           <Columns>
@@ -94,7 +93,11 @@
             <asp:BoundField DataField="Nombre" HeaderText="Nombre" />
             <asp:BoundField DataField="Apellido" HeaderText="Apellido" />
             <asp:BoundField DataField="Correo" HeaderText="Correo" />
-            <asp:BoundField DataField="IdDepartamento" HeaderText="Depto" />
+            <asp:TemplateField HeaderText="Departamento">
+              <ItemTemplate>
+                <%# Eval("DepartamentoNombre") %>
+              </ItemTemplate>
+            </asp:TemplateField>
             <asp:BoundField DataField="FechaIngreso" HeaderText="Ingreso" DataFormatString="{0:yyyy-MM-dd}" />
             <asp:BoundField DataField="Salario" HeaderText="Salario" DataFormatString="{0:N2}" />
           </Columns>
@@ -103,9 +106,6 @@
       </div>
     </div>
   </div>
-
-  <!-- (Opcional) Bootstrap JS -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 </form>
 </body>
 </html>

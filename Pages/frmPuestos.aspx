@@ -78,7 +78,6 @@
             <asp:BoundField DataField="Descripcion" HeaderText="Descripción" />
             <asp:BoundField DataField="SalarioBase" HeaderText="Salario Base" DataFormatString="{0:N2}" />
 
-            <%-- Reemplazo: en vez de IdDepartamento, mostramos el nombre --%>
             <asp:TemplateField HeaderText="Departamento">
               <ItemTemplate>
                 <%# GetDeptoNombre(Eval("IdDepartamento")) %>
@@ -91,8 +90,7 @@
     </div>
   </div>
 
-  <!-- (Opcional) Bootstrap JS -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+ 
 </form>
 </body>
 </html>

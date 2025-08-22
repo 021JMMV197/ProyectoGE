@@ -1,14 +1,18 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="frmAsistencia.aspx.cs"
-    Inherits="ProyectoGE.Pages.frmAsistencia" Async="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"
+    CodeBehind="frmAsistencia.aspx.cs"
+    Inherits="ProyectoGE.Pages.frmAsistencia"
+    Async="true"
+    ValidateRequest="false" %>
+
 <!DOCTYPE html>
 <html>
 <head runat="server">
   <title>Asistencia (API)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  
+
+  <!-- Bootstrap + tu tema -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
   <link href="~/Styles/Estilo.css?v=2" rel="stylesheet" runat="server" />
 </head>
 <body>
@@ -46,9 +50,9 @@
           <asp:TextBox ID="txtSalida" runat="server" CssClass="form-control" TextMode="Time" />
         </div>
 
-        <div class="col-12 col-md-12">
+        <div class="col-12">
           <label for="txtObs" class="form-label">Observación</label>
-          <asp:TextBox ID="txtObs" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="2" />
+          <asp:TextBox ID="txtObs" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="3" />
         </div>
       </div>
 
@@ -72,7 +76,7 @@
       <div class="table-responsive mt-3">
         <asp:GridView ID="gvAsis" runat="server" AutoGenerateColumns="False"
                       CssClass="table table-striped table-bordered table-sm"
-                      DataKeyNames="IdAsistencia"
+                      DataKeyNames="IdAsistencia,Observacion"
                       OnSelectedIndexChanged="gvAsis_SelectedIndexChanged"
                       GridLines="None">
           <Columns>
@@ -82,13 +86,14 @@
             <asp:BoundField DataField="Fecha" HeaderText="Fecha" DataFormatString="{0:yyyy-MM-dd}" />
             <asp:BoundField DataField="HoraEntrada" HeaderText="Entrada" DataFormatString="{0:HH:mm}" />
             <asp:BoundField DataField="HoraSalida" HeaderText="Salida" DataFormatString="{0:HH:mm}" />
-            <asp:BoundField DataField="Observacion" HeaderText="Observación" />
+            <asp:BoundField DataField="Observacion" HeaderText="Observación" HtmlEncode="false" />
           </Columns>
           <HeaderStyle CssClass="table-dark" />
         </asp:GridView>
       </div>
     </div>
   </div>
+
 </form>
 </body>
 </html>

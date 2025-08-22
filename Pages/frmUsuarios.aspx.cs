@@ -47,7 +47,7 @@ namespace ProyectoGE.Pages
                 {
                     IdUsuario = int.Parse(hfId.Value),
                     NombreUsuario = txtUsuario.Text.Trim(),
-                    Contrasena = string.IsNullOrWhiteSpace(txtPass.Text) ? null : txtPass.Text, // null -> mantiene hash
+                    Contrasena = string.IsNullOrWhiteSpace(txtPass.Text) ? null : txtPass.Text, 
                     Rol = txtRol.Text.Trim(),
                     Modificado_Por = "webforms"
                 };
@@ -79,10 +79,9 @@ namespace ProyectoGE.Pages
             var row = gvUsers.SelectedRow; if (row == null) return;
             hfId.Value = gvUsers.SelectedDataKey.Value.ToString();
 
-            // celdas: 0=select,1=ID,2=Usuario,3=Rol
             txtUsuario.Text = row.Cells[2].Text == "&nbsp;" ? "" : row.Cells[2].Text;
             txtRol.Text = row.Cells[3].Text == "&nbsp;" ? "" : row.Cells[3].Text;
-            txtPass.Text = ""; // nunca mostramos contraseñas
+            txtPass.Text = ""; 
         }
 
         private async Task CargarAsync()

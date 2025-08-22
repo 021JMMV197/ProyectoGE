@@ -7,10 +7,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
-  <link href="~/Styles/Estilo.css?v=2" rel="stylesheet" runat="server" />
+  <link href="~/Styles/Estilo.css?v=3" rel="stylesheet" runat="server" />
 </head>
 <body>
 <form id="form1" runat="server" class="container py-4">
@@ -77,21 +75,16 @@
       <div class="table-responsive mt-3">
         <asp:GridView ID="gvVac" runat="server" AutoGenerateColumns="False"
                       CssClass="table table-striped table-bordered table-sm"
-                      DataKeyNames="IdVacacion"
-                      OnSelectedIndexChanged="gvVac_SelectedIndexChanged"
-                      GridLines="None">
+                      GridLines="None"
+                      DataKeyNames="IdVacacion,IdEmpleado,FechaInicio,FechaFin,CantidadDias,Estado,EmpleadoNombre"
+                      OnSelectedIndexChanged="gvVac_SelectedIndexChanged">
           <Columns>
             <asp:CommandField ShowSelectButton="true" SelectText="Editar" />
             <asp:BoundField DataField="IdVacacion" HeaderText="ID" />
             <asp:BoundField DataField="IdEmpleado" HeaderText="EmpleadoId" />
-
-            <%-- NUEVA COLUMNA: Nombre del empleado --%>
             <asp:TemplateField HeaderText="Empleado">
-              <ItemTemplate>
-                <%# GetEmpleadoNombre(Eval("IdEmpleado")) %>
-              </ItemTemplate>
+              <ItemTemplate><%# Eval("EmpleadoNombre") %></ItemTemplate>
             </asp:TemplateField>
-
             <asp:BoundField DataField="FechaInicio" HeaderText="Inicio" DataFormatString="{0:yyyy-MM-dd}" />
             <asp:BoundField DataField="FechaFin" HeaderText="Fin" DataFormatString="{0:yyyy-MM-dd}" />
             <asp:BoundField DataField="CantidadDias" HeaderText="Días" />
@@ -103,8 +96,7 @@
     </div>
   </div>
 
-  <!-- (Opcional) Bootstrap JS -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+ 
 </form>
 </body>
 </html>

@@ -41,6 +41,7 @@ namespace ProyectoGE.Pages
                     Observacion = string.IsNullOrWhiteSpace(txtObs.Text) ? null : txtObs.Text.Trim(),
                     Adicionado_Por = "webforms"
                 };
+
                 if (dto.HoraEntrada.HasValue && dto.HoraSalida.HasValue && dto.HoraSalida < dto.HoraEntrada)
                 { lblMsg.Text = "Salida < Entrada."; return; }
 
@@ -56,7 +57,8 @@ namespace ProyectoGE.Pages
         {
             try
             {
-                if (string.IsNullOrEmpty(hfIdAsistencia.Value)) { lblMsg.Text = "Selecciona un registro."; return; }
+                if (string.IsNullOrEmpty(hfIdAsistencia.Value))
+                { lblMsg.Text = "Selecciona un registro."; return; }
 
                 var dto = new AsistenciaUpdateDto
                 {
@@ -68,6 +70,7 @@ namespace ProyectoGE.Pages
                     Observacion = string.IsNullOrWhiteSpace(txtObs.Text) ? null : txtObs.Text.Trim(),
                     Modificado_Por = "webforms"
                 };
+
                 if (dto.HoraEntrada.HasValue && dto.HoraSalida.HasValue && dto.HoraSalida < dto.HoraEntrada)
                 { lblMsg.Text = "Salida < Entrada."; return; }
 
@@ -82,7 +85,9 @@ namespace ProyectoGE.Pages
         {
             try
             {
-                if (string.IsNullOrEmpty(hfIdAsistencia.Value)) { lblMsg.Text = "Selecciona un registro."; return; }
+                if (string.IsNullOrEmpty(hfIdAsistencia.Value))
+                { lblMsg.Text = "Selecciona un registro."; return; }
+
                 bool ok = await _api.DeleteAsync(int.Parse(hfIdAsistencia.Value));
                 lblMsg.Text = ok ? "Eliminado." : "No encontrado.";
                 Limpiar();
@@ -91,21 +96,28 @@ namespace ProyectoGE.Pages
             catch (Exception ex) { lblMsg.Text = "Error al eliminar: " + ex.Message; }
         }
 
-        protected void btnLimpiar_Click(object sender, EventArgs e) { Limpiar(); lblMsg.Text = ""; }
+        protected void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            Limpiar();
+            lblMsg.Text = "";
+        }
 
         protected void gvAsis_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var row = gvAsis.SelectedRow; if (row == null) return;
+            var row = gvAsis.SelectedRow;
+            if (row == null) return;
+
             hfIdAsistencia.Value = gvAsis.SelectedDataKey.Value.ToString();
 
             txtFecha.Text = row.Cells[3].Text == "&nbsp;" ? "" : row.Cells[3].Text;
             txtEntrada.Text = row.Cells[4].Text == "&nbsp;" ? "" : row.Cells[4].Text;
             txtSalida.Text = row.Cells[5].Text == "&nbsp;" ? "" : row.Cells[5].Text;
-            txtObs.Text = row.Cells[6].Text == "&nbsp;" ? "" : row.Cells[6].Text;
+
+            var obsObj = gvAsis.SelectedDataKey.Values["Observacion"];
+            txtObs.Text = obsObj == null ? "" : Server.HtmlDecode(obsObj.ToString());
 
             var empIdText = row.Cells[2].Text == "&nbsp;" ? "" : row.Cells[2].Text;
-            int empId;
-            if (int.TryParse(empIdText, out empId))
+            if (int.TryParse(empIdText, out var empId))
             {
                 var item = ddlEmpleado.Items.FindByValue(empId.ToString());
                 if (item != null) ddlEmpleado.SelectedValue = empId.ToString();
@@ -152,8 +164,7 @@ namespace ProyectoGE.Pages
         private static DateTime? ParseFecha(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            DateTime d;
-            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out d)) return d;
+            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)) return d;
             if (DateTime.TryParse(s, out d)) return d;
             return null;
         }
@@ -162,19 +173,16 @@ namespace ProyectoGE.Pages
         {
             if (string.IsNullOrWhiteSpace(hora)) return null;
             var f = ParseFecha(fecha) ?? DateTime.Today;
-            DateTime dt;
-            // acepta "HH:mm"
-            if (DateTime.TryParseExact(hora.Trim(), "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out dt))
+            if (DateTime.TryParseExact(hora.Trim(), "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
                 return new DateTime(f.Year, f.Month, f.Day, dt.Hour, dt.Minute, 0);
-            // acepta hora local general
             if (DateTime.TryParse(hora, out dt))
                 return new DateTime(f.Year, f.Month, f.Day, dt.Hour, dt.Minute, 0);
             return null;
         }
+
         protected void btnAtras_Click(object sender, EventArgs e)
         {
             Response.Redirect("~/Pages/Menu.aspx");
         }
-
     }
 }

@@ -8,7 +8,7 @@ namespace ProyectoGE.Pages
     public partial class frmPuestos : System.Web.UI.Page
     {
         private readonly PuestoApiClient _api = new PuestoApiClient();
-        private readonly DepartamentoApiClient _depApi = new DepartamentoApiClient(); // usamos el que creamos antes
+        private readonly DepartamentoApiClient _depApi = new DepartamentoApiClient(); 
 
         protected async void Page_Load(object sender, EventArgs e)
         {
@@ -149,7 +149,6 @@ namespace ProyectoGE.Pages
             if (idObj == null) return string.Empty;
             if (!int.TryParse(idObj.ToString(), out var id)) return string.Empty;
 
-            // ddlDepto debe estar cargado con IdDepartamento -> Nombre antes de DataBind del Grid
             var item = ddlDepto.Items.FindByValue(id.ToString());
             return item?.Text ?? string.Empty;
         }

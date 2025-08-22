@@ -7,7 +7,6 @@ namespace ProyectoGE.Pages
     {
         protected void Page_Init(object sender, EventArgs e)
         {
-            // Requiere sesión; si no hay usuario, redirige a Login
             if (AuthGuard.Require(this)) return;
         }
 

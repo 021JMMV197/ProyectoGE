@@ -1,8 +1,10 @@
 ﻿using ProyectoGE.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using ProyectoGE.Infrastructure;
 
 namespace ProyectoGE.Pages
 {
@@ -17,11 +19,29 @@ namespace ProyectoGE.Pages
             public string NombreCompleto { get; set; }
         }
 
+        private class VacRow
+        {
+            public int IdVacacion { get; set; }
+            public int IdEmpleado { get; set; }
+            public string EmpleadoNombre { get; set; }
+            public DateTime? FechaInicio { get; set; }
+            public DateTime? FechaFin { get; set; }
+            public int CantidadDias { get; set; }
+            public string Estado { get; set; }
+        }
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            if (AuthGuard.Require(this)) return;
+        }
+
         protected async void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 await CargarEmpleadosAsync();
+                txtInicio.Text = DateTime.Today.ToString("yyyy-MM-dd");
+                ddlEstado.SelectedValue = "Pendiente";
                 await CargarAsync();
             }
         }
@@ -32,20 +52,26 @@ namespace ProyectoGE.Pages
         {
             try
             {
-                if (ddlEmpleado.Items.Count == 0) { lblMsg.Text = "No hay empleados."; return; }
-                var d = new VacacionCreateDto
+                DateTime fiVal = ParseFecha(txtInicio.Text) ?? DateTime.Today;
+                DateTime ffVal = ParseFecha(txtFin.Text) ?? fiVal;
+
+                if (ffVal < fiVal) { lblMsg.Text = "Fin < Inicio."; return; }
+
+                int diasVal = 0;
+                int.TryParse(txtDias.Text, out diasVal);
+
+                var dto = new VacacionCreateDto
                 {
                     IdEmpleado = int.Parse(ddlEmpleado.SelectedValue),
-                    FechaInicio = ParseFecha(txtInicio.Text) ?? throw new Exception("Fecha inicio inválida."),
-                    FechaFin = ParseFecha(txtFin.Text) ?? throw new Exception("Fecha fin inválida."),
-                    CantidadDias = ParseInt(txtDias.Text),
+                    FechaInicio = fiVal,          
+                    FechaFin = ffVal,             
+                    CantidadDias = diasVal,
                     Estado = ddlEstado.SelectedValue,
                     Adicionado_Por = "webforms"
                 };
-                if (d.FechaFin < d.FechaInicio) { lblMsg.Text = "Fin < Inicio."; return; }
 
-                int id = await _api.CreateAsync(d);
-                lblMsg.Text = "Creado Id = " + id;
+                int nuevoId = await _api.CreateAsync(dto);
+                lblMsg.Text = "Creado Id = " + nuevoId;
                 Limpiar();
                 await CargarAsync();
             }
@@ -57,19 +83,26 @@ namespace ProyectoGE.Pages
             try
             {
                 if (string.IsNullOrEmpty(hfIdVacacion.Value)) { lblMsg.Text = "Selecciona un registro."; return; }
-                var d = new VacacionUpdateDto
+
+                DateTime fiVal = ParseFecha(txtInicio.Text) ?? DateTime.Today;
+                DateTime ffVal = ParseFecha(txtFin.Text) ?? fiVal;
+                if (ffVal < fiVal) { lblMsg.Text = "Fin < Inicio."; return; }
+
+                int diasVal = 0;
+                int.TryParse(txtDias.Text, out diasVal);
+
+                var dto = new VacacionUpdateDto
                 {
                     IdVacacion = int.Parse(hfIdVacacion.Value),
                     IdEmpleado = int.Parse(ddlEmpleado.SelectedValue),
-                    FechaInicio = ParseFecha(txtInicio.Text) ?? throw new Exception("Fecha inicio inválida."),
-                    FechaFin = ParseFecha(txtFin.Text) ?? throw new Exception("Fecha fin inválida."),
-                    CantidadDias = ParseInt(txtDias.Text),
+                    FechaInicio = fiVal,          
+                    FechaFin = ffVal,             
+                    CantidadDias = diasVal,
                     Estado = ddlEstado.SelectedValue,
                     Modificado_Por = "webforms"
                 };
-                if (d.FechaFin < d.FechaInicio) { lblMsg.Text = "Fin < Inicio."; return; }
 
-                bool ok = await _api.UpdateAsync(d);
+                bool ok = await _api.UpdateAsync(dto);
                 lblMsg.Text = ok ? "Actualizado." : "No encontrado.";
                 await CargarAsync();
             }
@@ -91,39 +124,61 @@ namespace ProyectoGE.Pages
 
         protected void btnLimpiar_Click(object sender, EventArgs e) { Limpiar(); lblMsg.Text = ""; }
 
+        protected void btnAtras_Click(object sender, EventArgs e) => Response.Redirect("~/Pages/Menu.aspx");
+
         protected void gvVac_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var row = gvVac.SelectedRow; if (row == null) return;
-            hfIdVacacion.Value = gvVac.SelectedDataKey.Value.ToString();
+            var keys = gvVac.SelectedDataKey?.Values;
+            if (keys == null) return;
 
-            // Celdas: 0=Select, 1=ID, 2=IdEmpleado, 3=Inicio, 4=Fin, 5=Días, 6=Estado
-            txtInicio.Text = row.Cells[3].Text == "&nbsp;" ? "" : row.Cells[3].Text;
-            txtFin.Text = row.Cells[4].Text == "&nbsp;" ? "" : row.Cells[4].Text;
-            txtDias.Text = row.Cells[5].Text == "&nbsp;" ? "" : row.Cells[5].Text;
-            var estado = row.Cells[6].Text == "&nbsp;" ? "Pendiente" : row.Cells[6].Text;
-            var estItem = ddlEstado.Items.FindByValue(estado);
-            if (estItem != null) ddlEstado.SelectedValue = estado;
+            hfIdVacacion.Value = keys["IdVacacion"]?.ToString() ?? "";
 
-            var empIdText = row.Cells[2].Text == "&nbsp;" ? "" : row.Cells[2].Text;
-            if (int.TryParse(empIdText, out var empId))
-            {
-                var item = ddlEmpleado.Items.FindByValue(empId.ToString());
-                if (item != null) ddlEmpleado.SelectedValue = empId.ToString();
-            }
+            var idEmp = keys["IdEmpleado"]?.ToString() ?? "";
+            if (!string.IsNullOrEmpty(idEmp) && ddlEmpleado.Items.FindByValue(idEmp) != null)
+                ddlEmpleado.SelectedValue = idEmp;
+
+            var fi = keys["FechaInicio"];
+            var ff = keys["FechaFin"];
+            txtInicio.Text = (fi == null || fi is DBNull) ? "" : Convert.ToDateTime(fi).ToString("yyyy-MM-dd");
+            txtFin.Text = (ff == null || ff is DBNull) ? "" : Convert.ToDateTime(ff).ToString("yyyy-MM-dd");
+
+            var dias = keys["CantidadDias"];
+            txtDias.Text = (dias == null || dias is DBNull) ? "" : dias.ToString();
+
+            var est = keys["Estado"]?.ToString() ?? "";
+            if (!string.IsNullOrWhiteSpace(est) && ddlEstado.Items.FindByValue(est) != null)
+                ddlEstado.SelectedValue = est;
         }
 
         private async Task CargarAsync()
         {
             try
             {
-                var lista = await _api.ListAsync();   
-                gvVac.DataSource = lista;
+                var empPaged = await _empApi.ListAsync(1, 1000);
+                var empDict = empPaged.Items.ToDictionary(
+                    e => e.IdEmpleado,
+                    e => $"{e.Nombre ?? ""} {e.Apellido ?? ""}".Trim()
+                );
+
+                var vacs = await _api.ListAsync(); 
+
+                var rows = vacs.Select(v => new VacRow
+                {
+                    IdVacacion = v.IdVacacion,
+                    IdEmpleado = v.IdEmpleado,
+                    EmpleadoNombre = empDict.ContainsKey(v.IdEmpleado) ? empDict[v.IdEmpleado] : "",
+                    FechaInicio = v.FechaInicio,
+                    FechaFin = v.FechaFin,
+                    CantidadDias = v.CantidadDias,
+                    Estado = v.Estado
+                }).ToList();
+
+                gvVac.DataSource = rows;
                 gvVac.DataBind();
-                lblTotal.Text = "Total: " + (lista == null ? 0 : lista.Length);
+                lblTotal.Text = "Total: " + rows.Count;
             }
             catch (Exception ex) { lblMsg.Text = "Error al cargar: " + ex.Message; }
         }
-
 
         private async Task CargarEmpleadosAsync()
         {
@@ -133,8 +188,9 @@ namespace ProyectoGE.Pages
                 var lista = r.Items.Select(x => new EmpleadoItem
                 {
                     IdEmpleado = x.IdEmpleado,
-                    NombreCompleto = (x.Nombre ?? "") + " " + (x.Apellido ?? "")
-                }).ToList();
+                    NombreCompleto = ((x.Nombre ?? "") + " " + (x.Apellido ?? "")).Trim()
+                }).OrderBy(x => x.NombreCompleto).ToList();
+
                 ddlEmpleado.DataSource = lista;
                 ddlEmpleado.DataBind();
             }
@@ -145,33 +201,21 @@ namespace ProyectoGE.Pages
         {
             hfIdVacacion.Value = "";
             if (ddlEmpleado.Items.Count > 0) ddlEmpleado.SelectedIndex = 0;
+            txtInicio.Text = DateTime.Today.ToString("yyyy-MM-dd");
+            txtFin.Text = "";
+            txtDias.Text = "";
             ddlEstado.SelectedValue = "Pendiente";
-            txtInicio.Text = txtFin.Text = txtDias.Text = "";
         }
 
+        // Helpers
         private static DateTime? ParseFecha(string s)
         {
             if (string.IsNullOrWhiteSpace(s)) return null;
-            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out var d)) return d;
-            return DateTime.TryParse(s, out d) ? d : (DateTime?)null;
+            if (DateTime.TryParseExact(s.Trim(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d)) return d;
+            if (DateTime.TryParse(s, out d)) return d;
+            return null;
         }
 
         private static int ParseInt(string s) => int.TryParse(s, out var v) ? v : 0;
-        protected void btnAtras_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("~/Pages/Menu.aspx");
-        }
-        protected string GetEmpleadoNombre(object idObj)
-        {
-            if (idObj == null) return string.Empty;
-            if (!int.TryParse(idObj.ToString(), out var id)) return string.Empty;
-
-            // ddlEmpleado ya está cargado con IdEmpleado -> NombreCompleto
-            var item = ddlEmpleado.Items.FindByValue(id.ToString());
-            return item?.Text ?? string.Empty;
-        }
-
-
     }
 }

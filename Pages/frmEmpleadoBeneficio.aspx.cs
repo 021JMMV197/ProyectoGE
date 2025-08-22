@@ -98,7 +98,6 @@ namespace ProyectoGE.Pages
             var row = gvEB.SelectedRow; if (row == null) return;
             hfIdEB.Value = gvEB.SelectedDataKey.Value.ToString();
 
-            // celdas: 0=select,1=ID,2=IdEmpleado,3=IdBeneficio,4=Inicio,5=Fin,6=Estado,7=Obs
             txtInicio.Text = row.Cells[4].Text == "&nbsp;" ? "" : row.Cells[4].Text;
             txtFin.Text = row.Cells[5].Text == "&nbsp;" ? "" : row.Cells[5].Text;
             var estado = row.Cells[6].Text == "&nbsp;" ? "Activo" : row.Cells[6].Text;

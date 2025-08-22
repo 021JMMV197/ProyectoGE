@@ -1,5 +1,8 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="frmEvaluaciones.aspx.cs"
-    Inherits="ProyectoGE.Pages.frmEvaluaciones" Async="true" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"
+    CodeBehind="frmEvaluaciones.aspx.cs"
+    Inherits="ProyectoGE.Pages.frmEvaluaciones"
+    Async="true" %>
+
 <!DOCTYPE html>
 <html>
 <head runat="server">
@@ -7,9 +10,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
   <link href="~/Styles/Estilo.css?v=3" rel="stylesheet" runat="server" />
 </head>
 <body>
@@ -42,19 +43,20 @@
           <asp:TextBox ID="txtFin" runat="server" CssClass="form-control" TextMode="Date" />
         </div>
 
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label for="txtCalif" class="form-label">Calificación (0–10)</label>
           <asp:TextBox ID="txtCalif" runat="server" CssClass="form-control" TextMode="Number" />
         </div>
 
-        <div class="col-12 col-md-2">
+        <div class="col-6 col-md-2">
           <label for="txtEvaluador" class="form-label">Id Evaluador (opcional)</label>
           <asp:TextBox ID="txtEvaluador" runat="server" CssClass="form-control" />
         </div>
 
         <div class="col-12">
           <label for="txtComentarios" class="form-label">Comentarios</label>
-          <asp:TextBox ID="txtComentarios" runat="server" CssClass="form-control" TextMode="MultiLine" Rows="3" />
+          <asp:TextBox ID="txtComentarios" runat="server"
+                       CssClass="form-control" TextMode="MultiLine" Rows="3" />
         </div>
       </div>
 
@@ -78,16 +80,19 @@
       <div class="table-responsive mt-3">
         <asp:GridView ID="gvEval" runat="server" AutoGenerateColumns="False"
                       CssClass="table table-striped table-bordered table-sm"
-                      DataKeyNames="IdEvaluacion"
-                      OnSelectedIndexChanged="gvEval_SelectedIndexChanged"
-                      GridLines="None">
+                      GridLines="None"
+                      DataKeyNames="IdEvaluacion,IdEmpleado,PeriodoInicio,PeriodoFin,Calificacion,IdEvaluador,Comentarios"
+                      OnSelectedIndexChanged="gvEval_SelectedIndexChanged">
+
           <Columns>
             <asp:CommandField ShowSelectButton="true" SelectText="Editar" />
             <asp:BoundField DataField="IdEvaluacion" HeaderText="ID" />
+
             <asp:BoundField DataField="IdEmpleado" HeaderText="EmpleadoId" />
+
             <asp:TemplateField HeaderText="Empleado">
               <ItemTemplate>
-                <%# GetEmpleadoNombre(Eval("IdEmpleado")) %>
+                <%# Eval("EmpleadoNombre") %>
               </ItemTemplate>
             </asp:TemplateField>
 
@@ -95,16 +100,14 @@
             <asp:BoundField DataField="PeriodoFin" HeaderText="Fin" DataFormatString="{0:yyyy-MM-dd}" />
             <asp:BoundField DataField="Calificacion" HeaderText="Calificación" DataFormatString="{0:N2}" />
             <asp:BoundField DataField="IdEvaluador" HeaderText="EvaluadorId" />
-            <asp:BoundField DataField="Comentarios" HeaderText="Comentarios" />
+            <asp:BoundField DataField="Comentarios" HeaderText="Comentarios" HtmlEncode="false" />
           </Columns>
+
           <HeaderStyle CssClass="table-dark" />
         </asp:GridView>
       </div>
     </div>
   </div>
-
-  <!-- (Opcional) Bootstrap JS -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 </form>
 </body>
 </html>

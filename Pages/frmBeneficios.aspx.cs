@@ -83,7 +83,6 @@ namespace ProyectoGE.Pages
             var row = gvBenef.SelectedRow; if (row == null) return;
             hfIdBeneficio.Value = gvBenef.SelectedDataKey.Value.ToString();
 
-            // celdas: 0=select,1=ID,2=Nombre,3=Tipo,4=Monto,5=Descripcion
             txtNombre.Text = row.Cells[2].Text == "&nbsp;" ? "" : row.Cells[2].Text;
             txtTipo.Text = row.Cells[3].Text == "&nbsp;" ? "" : row.Cells[3].Text;
             txtMonto.Text = row.Cells[4].Text == "&nbsp;" ? "" : row.Cells[4].Text.Replace(",", "");
@@ -94,7 +93,7 @@ namespace ProyectoGE.Pages
         {
             try
             {
-                var r = await _api.ListAsync(1, 100); // página única grandecita
+                var r = await _api.ListAsync(1, 100); 
                 gvBenef.DataSource = r.Items;
                 gvBenef.DataBind();
                 lblTotal.Text = "Total: " + r.Total;
